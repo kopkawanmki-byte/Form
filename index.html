@@ -18,7 +18,6 @@
             font-family: 'Noto Serif', serif;
         }
 
-        /* Container A4 Utama */
         .a4-container {
             width: 210mm;
             min-height: 297mm;
@@ -33,39 +32,16 @@
             box-sizing: border-box;
             position: relative;
             color: #000;
-            line-height: 1.35; 
-            font-size: 11pt; 
+            line-height: 1.4; 
+            font-size: 13pt; 
             transition: none; 
         }
 
-        /* Perbaikan untuk proses Print Browser */
         @media print {
-            @page {
-                size: A4;
-                margin: 0;
-            }
-            body {
-                margin: 0;
-                padding: 0;
-                background: white;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .a4-container {
-                margin: 0;
-                box-shadow: none;
-            }
-            #printArea {
-                box-shadow: none;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .a4-container {
-                width: 100%;
-                overflow-x: auto;
-            }
+            @page { size: A4; margin: 0; }
+            body { margin: 0; padding: 0; background: white; }
+            .no-print { display: none !important; }
+            #printArea { box-shadow: none; }
         }
 
         .input-group label {
@@ -91,6 +67,17 @@
             transition: all 0.2s;
             cursor: pointer;
         }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -104,22 +91,56 @@
             <div class="bg-slate-800 p-5 rounded-xl shadow-lg text-white">
                 <h2 class="text-lg font-bold mb-3 flex items-center gap-2 border-b border-slate-700 pb-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    Page Setup
+                    Konfigurasi Halaman
                 </h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="input-group">
                         <label class="text-slate-400">Margin Atas (mm)</label>
-                        <input type="number" id="marginTop" value="5" min="0" oninput="applyPageSetup()" class="bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="number" id="marginTop" value="17" min="0" oninput="applyPageSetup()" class="bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div class="input-group">
                         <label class="text-slate-400">Ukuran Font (pt)</label>
-                        <input type="number" id="fontSize" value="11" min="8" step="0.5" oninput="applyPageSetup()" class="bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="number" id="fontSize" value="13" min="8" step="0.5" oninput="applyPageSetup()" class="bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
             </div>
 
             <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
-                <h2 class="font-bold text-gray-800 mb-3 border-b pb-1">1. Kop & Header</h2>
+                <div class="flex justify-between items-center mb-3 border-b pb-1">
+                    <h2 class="font-bold text-gray-800">1. Data Anggota</h2>
+                    <div id="dataStatus" class="text-[10px] text-gray-500">
+                        <span class="spinner"></span> Menghubungkan...
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="input-group">
+                        <label>Cari Nama Anggota (Dropdown)</label>
+                        <input type="text" id="memberSearch" list="memberList" placeholder="Ketik nama untuk mencari..." onchange="handleMemberSelect(this.value)">
+                        <datalist id="memberList"></datalist>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="input-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" id="nama" placeholder="Nama Otomatis" oninput="updatePreview()">
+                        </div>
+                        <div class="input-group">
+                            <label>Jabatan</label>
+                            <input type="text" id="jabatan" placeholder="Jabatan Otomatis" oninput="updatePreview()">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Unit Kerja / Departemen</label>
+                        <input type="text" id="departemen" placeholder="Unit Kerja Otomatis" oninput="updatePreview()">
+                    </div>
+                    <div class="input-group">
+                        <label>Kota & Tanggal</label>
+                        <input type="text" id="tanggal" value="Bogor, 15 Januari 2026" oninput="updatePreview()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                <h2 class="font-bold text-gray-800 mb-3 border-b pb-1">2. Pengaturan Kop</h2>
                 <div class="space-y-3">
                     <div class="input-group">
                         <label>Ganti Logo</label>
@@ -136,35 +157,9 @@
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
-                <h2 class="font-bold text-gray-800 mb-3 border-b pb-1">2. Data Anggota</h2>
-                <div class="space-y-3">
-                    <div class="input-group">
-                        <label>Nama Lengkap</label>
-                        <input type="text" id="nama" placeholder="Nama Lengkap" oninput="updatePreview()">
-                    </div>
-                    <div class="input-group">
-                        <label>NIK</label>
-                        <input type="text" id="nik" placeholder="NIK" oninput="updatePreview()">
-                    </div>
-                    <div class="input-group">
-                        <label>Jabatan</label>
-                        <input type="text" id="jabatan" placeholder="Jabatan" oninput="updatePreview()">
-                    </div>
-                    <div class="input-group">
-                        <label>Unit Kerja</label>
-                        <input type="text" id="departemen" placeholder="Departemen" oninput="updatePreview()">
-                    </div>
-                    <div class="input-group">
-                        <label>Kota & Tanggal</label>
-                        <input type="text" id="tanggal" value="Bogor, 15 Januari 2026" oninput="updatePreview()">
-                    </div>
-                </div>
-            </div>
-
             <button onclick="downloadPDF()" id="downloadBtn" class="btn bg-blue-600 text-white w-full hover:bg-blue-700 flex items-center justify-center gap-2 shadow-lg">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Download PDF (A4)
+                Unduh PDF (A4)
             </button>
         </div>
 
@@ -174,9 +169,9 @@
                 <div id="printArea" class="surat-font shadow-2xl">
                     
                     <!-- Header -->
-                    <div class="flex items-center gap-4 border-b-2 border-black pb-1 mb-2" id="headerSection">
+                    <div class="flex items-center gap-4 border-b-2 border-black pb-1 mb-12" id="headerSection">
                         <div class="w-16 h-16 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                            <img id="previewLogo" src="https://drive.google.com/uc?export=view&id=1GfRYHdZVEnt3WnSLJfmMKzx3HLSctPCh" crossorigin="anonymous" alt="Logo" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; document.getElementById('placeholderLogo').classList.remove('hidden');">
+                            <img id="previewLogo" src="https://lh3.googleusercontent.com/d/1GfRYHdZVEnt3WnSLJfmMKzx3HLSctPCh" crossorigin="anonymous" alt="Logo" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; document.getElementById('placeholderLogo').classList.remove('hidden');">
                             <div id="placeholderLogo" class="text-gray-300 hidden"><svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
                         </div>
                         
@@ -186,8 +181,8 @@
                         </div>
                     </div>
 
-                    <div class="text-center mb-4">
-                        <h2 class="text-[11pt] font-bold underline decoration-1 underline-offset-2 uppercase">SURAT PERNYATAAN KESANGGUPAN POTONG GAJI</h2>
+                    <div class="text-center mb-6">
+                        <h2 class="text-[1.1em] font-bold underline decoration-1 underline-offset-2 uppercase">SURAT PERNYATAAN KESANGGUPAN POTONG GAJI</h2>
                     </div>
 
                     <div class="text-justify">
@@ -195,7 +190,6 @@
                         
                         <table class="w-full mb-3 ml-4 border-separate border-spacing-y-0.5">
                             <tr><td class="w-36">Nama Lengkap</td><td class="w-4">:</td><td class="font-bold" id="previewNama">[Nama Lengkap]</td></tr>
-                            <tr><td>NIK</td><td>:</td><td id="previewNik">[Nomor Induk]</td></tr>
                             <tr><td>Jabatan</td><td>:</td><td id="previewJabatan">[Jabatan]</td></tr>
                             <tr><td>Departemen/Unit</td><td>:</td><td id="previewDepartemen">[Departemen]</td></tr>
                         </table>
@@ -236,17 +230,68 @@
     </div>
 
     <script>
+        let memberData = [];
+
+        // URL CSV dari Google Sheets (Pastikan tab yang benar diakses via GID)
+        const SPREADSHEET_ID = '1b74lCxO0EHGE7ZisoIccdoBdUX0zKseWIOBsvXX9gh4';
+        const GID = '351122201';
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${GID}`;
+
+        async function fetchMemberData() {
+            const statusEl = document.getElementById('dataStatus');
+            try {
+                const response = await fetch(CSV_URL);
+                const csvText = await response.text();
+                
+                // Parsing sederhana untuk baris CSV
+                const lines = csvText.split('\n');
+                
+                memberData = lines.slice(1).map(line => {
+                    // Regex untuk handle koma di dalam tanda kutip jika ada
+                    const columns = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+                    
+                    // Kolom B = Nama (index 1), Kolom C = Jabatan (index 2), Kolom D = Unit (index 3)
+                    const clean = (val) => val ? val.trim().replace(/^"|"$/g, '') : '';
+                    
+                    return {
+                        nama: clean(columns[1]),
+                        jabatan: clean(columns[2]),
+                        unit: clean(columns[3])
+                    };
+                }).filter(m => m.nama && m.nama !== "");
+
+                const datalist = document.getElementById('memberList');
+                datalist.innerHTML = memberData.map(m => `<option value="${m.nama}">`).join('');
+                
+                statusEl.innerHTML = `<span class="text-green-600 font-bold">● Terhubung ke Spreadsheet</span>`;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                statusEl.innerHTML = `<span class="text-red-600 font-bold">● Gagal memuat data</span>`;
+            }
+        }
+
+        function handleMemberSelect(selectedName) {
+            const member = memberData.find(m => m.nama === selectedName);
+            if (member) {
+                document.getElementById('nama').value = member.nama;
+                document.getElementById('jabatan').value = member.jabatan;
+                document.getElementById('departemen').value = member.unit;
+                updatePreview();
+                // Reset search box setelah pilih agar rapi
+                document.getElementById('memberSearch').blur();
+            }
+        }
+
         function applyPageSetup() {
             const mt = document.getElementById('marginTop').value;
             const fs = document.getElementById('fontSize').value;
             const doc = document.getElementById('printArea');
-            
             doc.style.paddingTop = mt + 'mm';
             doc.style.fontSize = fs + 'pt';
         }
 
         function updatePreview() {
-            const fields = ['nama', 'nik', 'jabatan', 'departemen', 'tanggal', 'kopNama', 'kopAlamat'];
+            const fields = ['nama', 'jabatan', 'departemen', 'tanggal', 'kopNama', 'kopAlamat'];
             const data = {};
             fields.forEach(f => {
                 const el = document.getElementById(f);
@@ -255,7 +300,6 @@
 
             document.getElementById('previewNama').innerText = data.nama || '[Nama Lengkap]';
             document.getElementById('previewNamaTTD').innerText = `( ${data.nama || 'Nama Lengkap'} )`;
-            document.getElementById('previewNik').innerText = data.nik || '[Nomor Induk]';
             document.getElementById('previewJabatan').innerText = data.jabatan || '[Jabatan]';
             document.getElementById('previewDepartemen').innerText = data.departemen || '[Departemen]';
             document.getElementById('previewTanggal').innerText = data.tanggal;
@@ -287,36 +331,18 @@
             btn.disabled = true;
             btn.innerText = 'Sedang Memproses...';
 
-            // Memastikan gambar logo dimuat sepenuhnya sebelum konversi
-            const logo = document.getElementById('previewLogo');
-            if (logo && logo.src && !logo.complete) {
-                await new Promise((resolve) => {
-                    logo.onload = resolve;
-                    logo.onerror = resolve;
-                });
-            }
-
             const opt = {
                 margin: 0,
                 filename: `Surat_Potong_Gaji_${namaFile.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true, 
-                    allowTaint: false,
-                    logging: false,
-                    scrollX: 0,
-                    scrollY: 0
-                },
+                html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             try {
-                // Gunakan promise secara eksplisit untuk menangani rejection
                 await html2pdf().set(opt).from(element).save();
             } catch (err) {
-                console.error("PDF Generation Error:", err);
-                // Menampilkan informasi error yang lebih baik di console jika terjadi kegagalan
+                console.error("PDF Error:", err);
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
@@ -324,6 +350,7 @@
         }
 
         window.onload = () => {
+            fetchMemberData();
             applyPageSetup();
             updatePreview();
         };
