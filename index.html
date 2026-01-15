@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Kesanggupan Potong Gaji Koperasi</title>
-    <!-- Tailwind CSS untuk styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Library html2pdf untuk convert ke PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Font Noto Sans untuk tampilan formal -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <style>
@@ -17,30 +14,53 @@
             background-color: #f3f4f6;
         }
         
-        /* Font khusus untuk surat agar terlihat formal */
         .surat-font {
             font-family: 'Noto Serif', serif;
         }
 
-        /* Styling area kertas A4 yang presisi */
+        /* Container A4 Utama */
         .a4-container {
             width: 210mm;
+            min-height: 297mm;
             margin: 0 auto;
         }
 
         #printArea {
             width: 210mm;
-            height: 296mm; /* Sedikit kurang dari 297mm untuk menghindari page break kosong */
+            height: 297mm; 
             background: white;
-            padding: 20mm 25mm; /* Margin standar surat */
+            padding: 5mm 25mm; 
             box-sizing: border-box;
             position: relative;
             color: #000;
-            line-height: 1.5;
-            font-size: 12pt;
+            line-height: 1.35; 
+            font-size: 11pt; 
+            transition: none; 
         }
 
-        /* Responsive untuk layar kecil (mobile) agar tetap bisa input */
+        /* Perbaikan untuk proses Print Browser */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .a4-container {
+                margin: 0;
+                box-shadow: none;
+            }
+            #printArea {
+                box-shadow: none;
+            }
+        }
+
         @media (max-width: 1024px) {
             .a4-container {
                 width: 100%;
@@ -50,18 +70,18 @@
 
         .input-group label {
             display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4b5563;
             margin-bottom: 0.25rem;
         }
 
-        .input-group input, .input-group textarea {
+        .input-group input, .input-group textarea, .input-group select {
             width: 100%;
             padding: 0.5rem;
             border: 1px solid #d1d5db;
             border-radius: 0.375rem;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .btn {
@@ -71,50 +91,60 @@
             transition: all 0.2s;
             cursor: pointer;
         }
-
-        /* Pengaturan print agar tidak ada margin tambahan dari browser */
-        @media print {
-            body { background: none; padding: 0; }
-            .a4-container { margin: 0; box-shadow: none; }
-        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- KOLOM KIRI: FORM INPUT -->
-        <div class="lg:col-span-4 space-y-6 no-print">
-            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">1. Data Koperasi & Header</h2>
-                
-                <div class="space-y-4">
+        <!-- KOLOM KIRI: SETTINGS & INPUT -->
+        <div class="lg:col-span-4 space-y-4 no-print">
+            
+            <!-- PAGE SETUP -->
+            <div class="bg-slate-800 p-5 rounded-xl shadow-lg text-white">
+                <h2 class="text-lg font-bold mb-3 flex items-center gap-2 border-b border-slate-700 pb-2">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    Page Setup
+                </h2>
+                <div class="grid grid-cols-2 gap-4">
                     <div class="input-group">
-                        <label>Upload Logo / Header (Format: PNG/JPG)</label>
-                        <input type="file" id="logoInput" accept="image/*" class="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <label class="text-slate-400">Margin Atas (mm)</label>
+                        <input type="number" id="marginTop" value="5" min="0" oninput="applyPageSetup()" class="bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
-
                     <div class="input-group">
-                        <label>Nama Koperasi</label>
-                        <input type="text" id="kopNama" value="KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA" oninput="updatePreview()">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Alamat Koperasi</label>
-                        <textarea id="kopAlamat" rows="3" oninput="updatePreview()">PT Mitra Kiara Indonesia Jl. Raya Narogong KM 7 Kp. Narogong, Kembang Kuning, Klapanunggal, Kab. Bogor, Jawa Barat, 16872&#10;Telp: +6285717050604 | Email: abi@mitrakiaraindonesia.com</textarea>
+                        <label class="text-slate-400">Ukuran Font (pt)</label>
+                        <input type="number" id="fontSize" value="11" min="8" step="0.5" oninput="applyPageSetup()" class="bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">2. Data Anggota</h2>
-                <div class="space-y-4">
+            <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                <h2 class="font-bold text-gray-800 mb-3 border-b pb-1">1. Kop & Header</h2>
+                <div class="space-y-3">
+                    <div class="input-group">
+                        <label>Ganti Logo</label>
+                        <input type="file" id="logoInput" accept="image/*" class="text-xs">
+                    </div>
+                    <div class="input-group">
+                        <label>Nama Koperasi</label>
+                        <input type="text" id="kopNama" value="KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA" oninput="updatePreview()">
+                    </div>
+                    <div class="input-group">
+                        <label>Alamat & Kontak</label>
+                        <textarea id="kopAlamat" rows="2" oninput="updatePreview()">PT Mitra Kiara Indonesia Jl. Raya Narogong KM 7 Kp. Narogong, Kembang Kuning, Klapanunggal, Kab. Bogor, Jawa Barat, 16872&#10;Telp: +6285717050604 | Email: abi@mitrakiaraindonesia.com</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                <h2 class="font-bold text-gray-800 mb-3 border-b pb-1">2. Data Anggota</h2>
+                <div class="space-y-3">
                     <div class="input-group">
                         <label>Nama Lengkap</label>
                         <input type="text" id="nama" placeholder="Nama Lengkap" oninput="updatePreview()">
                     </div>
                     <div class="input-group">
-                        <label>Nomor Induk Karyawan (NIK)</label>
+                        <label>NIK</label>
                         <input type="text" id="nik" placeholder="NIK" oninput="updatePreview()">
                     </div>
                     <div class="input-group">
@@ -122,112 +152,81 @@
                         <input type="text" id="jabatan" placeholder="Jabatan" oninput="updatePreview()">
                     </div>
                     <div class="input-group">
-                        <label>Departemen / Unit Kerja</label>
+                        <label>Unit Kerja</label>
                         <input type="text" id="departemen" placeholder="Departemen" oninput="updatePreview()">
                     </div>
                     <div class="input-group">
-                        <label>Kota & Tanggal Surat</label>
+                        <label>Kota & Tanggal</label>
                         <input type="text" id="tanggal" value="Bogor, 15 Januari 2026" oninput="updatePreview()">
                     </div>
                 </div>
             </div>
 
-            <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
-                <h3 class="font-bold text-blue-800 mb-2">Informasi Potongan</h3>
-                <ul class="text-sm text-blue-700 space-y-1 list-disc pl-5">
-                    <li>Simpanan Pokok: <strong>Rp 200.000</strong> (Sekali)</li>
-                    <li>Simpanan Wajib: <strong>Rp 100.000</strong> (Per Bulan)</li>
-                </ul>
-                <button onclick="downloadPDF()" class="btn bg-blue-600 text-white w-full mt-6 hover:bg-blue-700 flex items-center justify-center gap-2 shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Download PDF (A4)
-                </button>
-            </div>
+            <button onclick="downloadPDF()" id="downloadBtn" class="btn bg-blue-600 text-white w-full hover:bg-blue-700 flex items-center justify-center gap-2 shadow-lg">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Download PDF (A4)
+            </button>
         </div>
 
         <!-- KOLOM KANAN: PREVIEW SURAT -->
-        <div class="lg:col-span-8 flex justify-center bg-gray-400 p-4 rounded-xl overflow-auto border border-gray-500">
+        <div class="lg:col-span-8 flex justify-center bg-zinc-500 p-4 rounded-xl overflow-auto border border-zinc-600">
             <div class="a4-container">
-                <!-- AREA KERTAS -->
                 <div id="printArea" class="surat-font shadow-2xl">
                     
-                    <!-- Header Surat -->
-                    <div class="flex items-center gap-6 border-b-4 border-double border-black pb-4 mb-6">
-                        <div class="w-24 h-24 flex-shrink-0 flex items-center justify-center">
-                            <img id="previewLogo" src="https://drive.google.com/uc?export=view&id=1GfRYHdZVEnt3WnSLJfmMKzx3HLSctPCh" alt="Logo" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; document.getElementById('placeholderLogo').classList.remove('hidden');">
-                            <div id="placeholderLogo" class="text-gray-300 text-center hidden">
-                                <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            </div>
+                    <!-- Header -->
+                    <div class="flex items-center gap-4 border-b-2 border-black pb-1 mb-2" id="headerSection">
+                        <div class="w-16 h-16 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                            <img id="previewLogo" src="https://drive.google.com/uc?export=view&id=1GfRYHdZVEnt3WnSLJfmMKzx3HLSctPCh" crossorigin="anonymous" alt="Logo" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; document.getElementById('placeholderLogo').classList.remove('hidden');">
+                            <div id="placeholderLogo" class="text-gray-300 hidden"><svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
                         </div>
                         
-                        <div class="flex-1 text-center pr-12">
-                            <h1 id="previewKopNama" class="text-lg font-bold uppercase leading-tight">KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA</h1>
-                            <p id="previewKopAlamat" class="text-[9pt] mt-1 whitespace-pre-line leading-snug">PT Mitra Kiara Indonesia Jl. Raya Narogong KM 7 Kp. Narogong, Kembang Kuning, Klapanunggal, Kab. Bogor, Jawa Barat, 16872&#10;Telp: +6285717050604 | Email: abi@mitrakiaraindonesia.com</p>
+                        <div class="flex-1 text-center pr-8">
+                            <h1 id="previewKopNama" class="text-[11pt] font-bold uppercase leading-tight mb-1">KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA</h1>
+                            <p id="previewKopAlamat" class="text-[8pt] whitespace-pre-line leading-tight">PT Mitra Kiara Indonesia Jl. Raya Narogong KM 7 Kp. Narogong, Kembang Kuning, Klapanunggal, Kab. Bogor, Jawa Barat, 16872&#10;Telp: +6285717050604 | Email: abi@mitrakiaraindonesia.com</p>
                         </div>
                     </div>
 
-                    <!-- Judul Surat -->
-                    <div class="text-center mb-10">
-                        <h2 class="text-md font-bold underline decoration-1 underline-offset-4 uppercase">SURAT PERNYATAAN KESANGGUPAN POTONG GAJI</h2>
+                    <div class="text-center mb-4">
+                        <h2 class="text-[11pt] font-bold underline decoration-1 underline-offset-2 uppercase">SURAT PERNYATAAN KESANGGUPAN POTONG GAJI</h2>
                     </div>
 
-                    <!-- Isi Surat -->
-                    <div class="text-justify text-[11.5pt]">
-                        <p class="mb-4">Saya yang bertanda tangan di bawah ini:</p>
+                    <div class="text-justify">
+                        <p class="mb-2">Saya yang bertanda tangan di bawah ini:</p>
                         
-                        <table class="w-full mb-6 ml-6 border-separate border-spacing-y-1">
-                            <tr>
-                                <td class="w-44 py-0.5">Nama Lengkap</td>
-                                <td class="w-4">:</td>
-                                <td class="font-bold" id="previewNama">[Nama Lengkap]</td>
-                            </tr>
-                            <tr>
-                                <td class="py-0.5">NIK</td>
-                                <td>:</td>
-                                <td id="previewNik">[Nomor Induk]</td>
-                            </tr>
-                            <tr>
-                                <td class="py-0.5">Jabatan</td>
-                                <td>:</td>
-                                <td id="previewJabatan">[Jabatan]</td>
-                            </tr>
-                            <tr>
-                                <td class="py-0.5">Departemen/Unit</td>
-                                <td>:</td>
-                                <td id="previewDepartemen">[Departemen]</td>
-                            </tr>
+                        <table class="w-full mb-3 ml-4 border-separate border-spacing-y-0.5">
+                            <tr><td class="w-36">Nama Lengkap</td><td class="w-4">:</td><td class="font-bold" id="previewNama">[Nama Lengkap]</td></tr>
+                            <tr><td>NIK</td><td>:</td><td id="previewNik">[Nomor Induk]</td></tr>
+                            <tr><td>Jabatan</td><td>:</td><td id="previewJabatan">[Jabatan]</td></tr>
+                            <tr><td>Departemen/Unit</td><td>:</td><td id="previewDepartemen">[Departemen]</td></tr>
                         </table>
 
-                        <p class="mb-4">
+                        <p class="mb-2">
                             Dengan ini menyatakan secara sadar dan sukarela terdaftar sebagai anggota <span id="textKopNama" class="font-bold">KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA</span> dan memberikan kuasa serta wewenang kepada Bagian Payroll / HRD untuk melakukan pemotongan gaji saya guna pembayaran kewajiban anggota sebagai berikut:
                         </p>
 
-                        <div class="ml-6 mb-6 border border-black p-4 bg-gray-50">
-                            <ul class="list-disc list-outside ml-4 space-y-4">
+                        <div class="ml-4 mb-3 border border-black p-2.5 bg-gray-50">
+                            <ul class="list-disc list-outside ml-4 space-y-1.5">
                                 <li>
                                     <span class="font-bold">Simpanan Pokok</span> sebesar <span class="font-bold italic">Rp 200.000,- (Dua Ratus Ribu Rupiah)</span>. 
-                                    <br><span class="text-[10pt] font-medium text-gray-700">Dipotong satu kali pada saat awal menjadi anggota koperasi.</span>
+                                    <br><span class="text-[0.85em] font-medium text-gray-700 italic">Dipotong satu kali pada saat awal menjadi anggota koperasi.</span>
                                 </li>
                                 <li>
                                     <span class="font-bold">Simpanan Wajib</span> sebesar <span class="font-bold italic">Rp 100.000,- (Seratus Ribu Rupiah)</span>. 
-                                    <br><span class="text-[10pt] font-medium text-gray-700">Dipotong secara rutin setiap bulan melalui sistem payroll perusahaan.</span>
+                                    <br><span class="text-[0.85em] font-medium text-gray-700 italic">Dipotong secara rutin setiap bulan melalui sistem payroll perusahaan.</span>
                                 </li>
                             </ul>
                         </div>
 
-                        <p class="mb-12">
+                        <p class="mb-4">
                             Demikian surat pernyataan ini saya buat dengan sebenarnya tanpa ada unsur paksaan dari pihak manapun, agar dapat dipergunakan sebagaimana mestinya.
                         </p>
                     </div>
 
-                    <!-- Tanda Tangan -->
-                    <div class="flex justify-end mt-16">
-                        <div class="text-center w-72">
-                            <p class="mb-24" id="previewTanggal">Bogor, 15 Januari 2026</p>
+                    <div class="flex justify-end mt-4">
+                        <div class="text-center w-64">
+                            <p class="mb-16" id="previewTanggal">Bogor, 15 Januari 2026</p>
                             <p class="font-bold underline uppercase" id="previewNamaTTD">( Nama Lengkap )</p>
-                            <p class="text-sm italic">Anggota Koperasi</p>
+                            <p class="text-[0.8em] italic">Anggota Koperasi</p>
                         </div>
                     </div>
 
@@ -237,75 +236,97 @@
     </div>
 
     <script>
-        function updatePreview() {
-            const nama = document.getElementById('nama').value || '[Nama Lengkap]';
-            const nik = document.getElementById('nik').value || '[Nomor Induk]';
-            const jabatan = document.getElementById('jabatan').value || '[Jabatan]';
-            const departemen = document.getElementById('departemen').value || '[Departemen]';
-            const tanggal = document.getElementById('tanggal').value || 'Bogor, ...';
-            const kopNama = document.getElementById('kopNama').value;
-            const kopAlamat = document.getElementById('kopAlamat').value;
-
-            document.getElementById('previewNama').innerText = nama;
-            document.getElementById('previewNamaTTD').innerText = `( ${nama} )`;
-            document.getElementById('previewNik').innerText = nik;
-            document.getElementById('previewJabatan').innerText = jabatan;
-            document.getElementById('previewDepartemen').innerText = departemen;
-            document.getElementById('previewTanggal').innerText = tanggal;
-            document.getElementById('previewKopNama').innerText = kopNama;
-            document.getElementById('textKopNama').innerText = kopNama;
-            document.getElementById('previewKopAlamat').innerText = kopAlamat;
+        function applyPageSetup() {
+            const mt = document.getElementById('marginTop').value;
+            const fs = document.getElementById('fontSize').value;
+            const doc = document.getElementById('printArea');
+            
+            doc.style.paddingTop = mt + 'mm';
+            doc.style.fontSize = fs + 'pt';
         }
 
-        const logoInput = document.getElementById('logoInput');
-        const previewLogo = document.getElementById('previewLogo');
-        const placeholderLogo = document.getElementById('placeholderLogo');
+        function updatePreview() {
+            const fields = ['nama', 'nik', 'jabatan', 'departemen', 'tanggal', 'kopNama', 'kopAlamat'];
+            const data = {};
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                data[f] = el ? el.value : '';
+            });
 
-        logoInput.addEventListener('change', function(e) {
+            document.getElementById('previewNama').innerText = data.nama || '[Nama Lengkap]';
+            document.getElementById('previewNamaTTD').innerText = `( ${data.nama || 'Nama Lengkap'} )`;
+            document.getElementById('previewNik').innerText = data.nik || '[Nomor Induk]';
+            document.getElementById('previewJabatan').innerText = data.jabatan || '[Jabatan]';
+            document.getElementById('previewDepartemen').innerText = data.departemen || '[Departemen]';
+            document.getElementById('previewTanggal').innerText = data.tanggal;
+            document.getElementById('previewKopNama').innerText = data.kopNama;
+            document.getElementById('textKopNama').innerText = data.kopNama;
+            document.getElementById('previewKopAlamat').innerText = data.kopAlamat;
+        }
+
+        document.getElementById('logoInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewLogo.src = e.target.result;
-                    previewLogo.style.display = 'block'; 
-                    previewLogo.classList.remove('hidden');
-                    placeholderLogo.classList.add('hidden');
-                }
+                reader.onload = (e) => {
+                    const img = document.getElementById('previewLogo');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('placeholderLogo').classList.add('hidden');
+                };
                 reader.readAsDataURL(file);
             }
         });
 
-        function downloadPDF() {
+        async function downloadPDF() {
             const element = document.getElementById('printArea');
-            const namaFile = document.getElementById('nama').value.replace(/\s+/g, '_') || 'Surat';
-            
+            const namaFile = document.getElementById('nama').value.trim() || 'Surat';
+            const btn = document.getElementById('downloadBtn');
+            const originalHTML = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerText = 'Sedang Memproses...';
+
+            // Memastikan gambar logo dimuat sepenuhnya sebelum konversi
+            const logo = document.getElementById('previewLogo');
+            if (logo && logo.src && !logo.complete) {
+                await new Promise((resolve) => {
+                    logo.onload = resolve;
+                    logo.onerror = resolve;
+                });
+            }
+
             const opt = {
-                margin:       0,
-                filename:     `Surat_Kesanggupan_${namaFile}.pdf`,
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { 
-                    scale: 3, // Skala tinggi agar tajam
-                    useCORS: true,
-                    letterRendering: true,
-                    logging: false
+                margin: 0,
+                filename: `Surat_Potong_Gaji_${namaFile.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: false,
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0
                 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            const btn = document.querySelector('button');
-            btn.innerText = 'Memproses PDF...';
-            btn.disabled = true;
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                btn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Download PDF (A4)
-                `;
+            try {
+                // Gunakan promise secara eksplisit untuk menangani rejection
+                await html2pdf().set(opt).from(element).save();
+            } catch (err) {
+                console.error("PDF Generation Error:", err);
+                // Menampilkan informasi error yang lebih baik di console jika terjadi kegagalan
+            } finally {
+                btn.innerHTML = originalHTML;
                 btn.disabled = false;
-            });
+            }
         }
+
+        window.onload = () => {
+            applyPageSetup();
+            updatePreview();
+        };
     </script>
 </body>
 </html>
