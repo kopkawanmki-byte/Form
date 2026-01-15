@@ -250,13 +250,15 @@
                     // Regex untuk handle koma di dalam tanda kutip jika ada
                     const columns = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
                     
-                    // Kolom B = Nama (index 1), Kolom C = Jabatan (index 2), Kolom D = Unit (index 3)
                     const clean = (val) => val ? val.trim().replace(/^"|"$/g, '') : '';
                     
+                    // Kolom B = Nama (index 1)
+                    // Kolom C = Unit Kerja (index 2) -> Sesuai instruksi: Unit Kerja kolom C
+                    // Kolom D = Jabatan (index 3) -> Sesuai instruksi: Jabatan kolom D
                     return {
                         nama: clean(columns[1]),
-                        jabatan: clean(columns[2]),
-                        unit: clean(columns[3])
+                        unit: clean(columns[2]),
+                        jabatan: clean(columns[3])
                     };
                 }).filter(m => m.nama && m.nama !== "");
 
@@ -277,7 +279,6 @@
                 document.getElementById('jabatan').value = member.jabatan;
                 document.getElementById('departemen').value = member.unit;
                 updatePreview();
-                // Reset search box setelah pilih agar rapi
                 document.getElementById('memberSearch').blur();
             }
         }
