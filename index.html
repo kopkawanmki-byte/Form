@@ -18,6 +18,7 @@
             font-family: 'Noto Serif', serif;
         }
 
+        /* Kontainer utama untuk A4 */
         .a4-container {
             width: 210mm;
             min-height: 297mm;
@@ -38,6 +39,20 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+        }
+
+        /* Responsif untuk Mobile */
+        @media (max-width: 768px) {
+            .a4-preview-wrapper {
+                transform: scale(0.45); /* Mengecilkan preview di HP agar terlihat utuh */
+                transform-origin: top center;
+                margin-bottom: -150mm; /* Menghapus whitespace akibat scaling */
+            }
+            .a4-scroll-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 20px;
+            }
         }
 
         @media print {
@@ -61,10 +76,10 @@
 
         .input-group input, .input-group textarea, .input-group select {
             width: 100%;
-            padding: 0.5rem;
+            padding: 0.6rem;
             border: 1px solid #d1d5db;
             border-radius: 0.375rem;
-            font-size: 0.9rem;
+            font-size: 1rem; /* Ukuran font lebih besar di HP agar tidak auto-zoom */
         }
 
         .btn {
@@ -87,17 +102,17 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-2 md:p-8">
 
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
         
-        <!-- KOLOM KIRI: SETTINGS & INPUT -->
-        <div class="lg:col-span-4 space-y-4 no-print">
+        <!-- KOLOM KIRI: SETTINGS & INPUT (Akan di atas saat di HP) -->
+        <div class="lg:col-span-4 space-y-4 no-print order-1">
             
             <div class="bg-slate-800 p-5 rounded-xl shadow-lg text-white">
                 <h2 class="text-lg font-bold mb-3 flex items-center gap-2 border-b border-slate-700 pb-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    Tata Letak PDF
+                    Pengaturan
                 </h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="input-group">
@@ -105,7 +120,7 @@
                         <input type="number" id="marginTop" value="10" min="0" oninput="applyPageSetup()" class="bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div class="input-group">
-                        <label class="text-slate-400">Ukuran Font (pt)</label>
+                        <label class="text-slate-400">Font (pt)</label>
                         <input type="number" id="fontSize" value="11.5" min="8" step="0.5" oninput="applyPageSetup()" class="bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
@@ -118,13 +133,13 @@
                         <span class="spinner"></span> Menghubungkan...
                     </div>
                 </div>
-                <div class="space-y-3">
+                <div class="space-y-4">
                     <div class="input-group">
                         <label>Cari Nama Anggota</label>
                         <input type="text" id="memberSearch" list="memberList" placeholder="Ketik nama anggota..." onchange="handleMemberSelect(this.value)">
                         <datalist id="memberList"></datalist>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="input-group">
                             <label>Nama Lengkap</label>
                             <input type="text" id="nama" placeholder="..." oninput="updatePreview()">
@@ -147,7 +162,7 @@
 
             <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
                 <h2 class="font-bold text-gray-800 mb-3 border-b pb-1">2. Pengaturan Kop</h2>
-                <div class="space-y-3">
+                <div class="space-y-4">
                     <div class="input-group">
                         <label>Ganti Logo</label>
                         <input type="file" id="logoInput" accept="image/*" class="text-xs">
@@ -158,87 +173,91 @@
                     </div>
                     <div class="input-group">
                         <label>Alamat & Kontak</label>
-                        <textarea id="kopAlamat" rows="2" oninput="updatePreview()">PT Mitra Kiara Indonesia Jl. Raya Narogong KM 7 Kp. Narogong, Kembang Kuning, Klapanunggal, Kab. Bogor, Jawa Barat, 16872&#10;Telp: +6285717050604 | Email: abi@mitrakiaraindonesia.com</textarea>
+                        <textarea id="kopAlamat" rows="3" oninput="updatePreview()">PT Mitra Kiara Indonesia Jl. Raya Narogong KM 7 Kp. Narogong, Kembang Kuning, Klapanunggal, Kab. Bogor, Jawa Barat, 16872&#10;Telp: +6285717050604 | Email: abi@mitrakiaraindonesia.com</textarea>
                     </div>
                 </div>
             </div>
 
-            <button onclick="downloadPDF()" id="downloadBtn" class="btn bg-blue-600 text-white w-full hover:bg-blue-700 flex items-center justify-center gap-2 shadow-lg">
+            <button onclick="downloadPDF()" id="downloadBtn" class="btn bg-blue-600 text-white w-full hover:bg-blue-700 flex items-center justify-center gap-2 shadow-lg mb-8">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 Cetak PDF (1 Halaman)
             </button>
         </div>
 
         <!-- KOLOM KANAN: PREVIEW SURAT -->
-        <div class="lg:col-span-8 flex justify-center bg-zinc-500 p-4 rounded-xl overflow-auto border border-zinc-600">
-            <div class="a4-container">
-                <div id="printArea" class="surat-font shadow-2xl">
-                    
-                    <!-- Header -->
-                    <div class="flex items-center gap-4 border-b-2 border-black pb-1" id="headerSection">
-                        <div class="w-16 h-16 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                            <img id="previewLogo" src="https://lh3.googleusercontent.com/d/1GfRYHdZVEnt3WnSLJfmMKzx3HLSctPCh" crossorigin="anonymous" alt="Logo" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; document.getElementById('placeholderLogo').classList.remove('hidden');">
-                            <div id="placeholderLogo" class="text-gray-300 hidden"><svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
-                        </div>
-                        
-                        <div class="flex-1 text-center pr-8">
-                            <h1 id="previewKopNama" class="text-[11pt] font-bold uppercase leading-tight mb-1">KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA</h1>
-                            <p id="previewKopAlamat" class="text-[8pt] whitespace-pre-line leading-tight">PT Mitra Kiara Indonesia Jl. Raya Narogong KM 7 Kp. Narogong, Kembang Kuning, Klapanunggal, Kab. Bogor, Jawa Barat, 16872&#10;Telp: +6285717050604 | Email: abi@mitrakiaraindonesia.com</p>
+        <div class="lg:col-span-8 flex flex-col items-center bg-zinc-500 p-2 md:p-4 rounded-xl overflow-hidden border border-zinc-600 order-2">
+            <div class="text-white text-xs mb-2 md:hidden">Geser untuk melihat pratinjau surat &rarr;</div>
+            <div class="a4-scroll-container w-full">
+                <div class="a4-preview-wrapper">
+                    <div class="a4-container">
+                        <div id="printArea" class="surat-font shadow-2xl">
+                            
+                            <!-- Header -->
+                            <div class="flex items-center gap-4 border-b-2 border-black pb-1" id="headerSection">
+                                <div class="w-16 h-16 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                    <img id="previewLogo" src="https://lh3.googleusercontent.com/d/1GfRYHdZVEnt3WnSLJfmMKzx3HLSctPCh" crossorigin="anonymous" alt="Logo" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; document.getElementById('placeholderLogo').classList.remove('hidden');">
+                                    <div id="placeholderLogo" class="text-gray-300 hidden"><svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
+                                </div>
+                                
+                                <div class="flex-1 text-center pr-8">
+                                    <h1 id="previewKopNama" class="text-[11pt] font-bold uppercase leading-tight mb-1">KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA</h1>
+                                    <p id="previewKopAlamat" class="text-[8pt] whitespace-pre-line leading-tight">PT Mitra Kiara Indonesia Jl. Raya Narogong KM 7 Kp. Narogong, Kembang Kuning, Klapanunggal, Kab. Bogor, Jawa Barat, 16872&#10;Telp: +6285717050604 | Email: abi@mitrakiaraindonesia.com</p>
+                                </div>
+                            </div>
+
+                            <!-- SPACE SEBELUM JUDUL (5 baris) -->
+                            <div class="h-[75px]"></div>
+
+                            <div class="text-center">
+                                <h2 class="text-[1.15em] font-bold underline decoration-1 underline-offset-2 uppercase">SURAT PERNYATAAN KESANGGUPAN POTONG GAJI</h2>
+                            </div>
+
+                            <!-- SPACE SETELAH JUDUL (4 baris) -->
+                            <div class="h-[60px]"></div>
+
+                            <div class="text-justify">
+                                <p class="mb-2">Saya yang bertanda tangan di bawah ini:</p>
+                                
+                                <table class="w-full mb-3 ml-4 border-separate border-spacing-y-0.5">
+                                    <tr><td class="w-40">Nama Lengkap</td><td class="w-4">:</td><td class="font-bold" id="previewNama">[Nama Lengkap]</td></tr>
+                                    <tr><td>Jabatan</td><td>:</td><td id="previewJabatan">[Jabatan]</td></tr>
+                                    <tr><td>Departemen/Unit</td><td>:</td><td id="previewDepartemen">[Departemen]</td></tr>
+                                </table>
+
+                                <p class="mb-3">
+                                    Dengan ini menyatakan secara sadar dan sukarela terdaftar sebagai anggota <span id="textKopNama" class="font-bold">KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA</span> dan memberikan kuasa serta wewenang kepada Bagian Payroll / HRD untuk melakukan pemotongan gaji saya guna pembayaran kewajiban anggota sebagai berikut:
+                                </p>
+
+                                <div class="ml-4 mb-3 border border-black p-3 bg-gray-50">
+                                    <ul class="list-disc list-outside ml-5 space-y-1">
+                                        <li>
+                                            <span class="font-bold">Simpanan Pokok</span> sebesar <span class="font-bold italic">Rp 200.000,- (Dua Ratus Ribu Rupiah)</span>. 
+                                            <br><span class="text-[0.85em] font-medium text-gray-700 italic">Dipotong satu kali pada saat awal menjadi anggota koperasi.</span>
+                                        </li>
+                                        <li>
+                                            <span class="font-bold">Simpanan Wajib</span> sebesar <span class="font-bold italic">Rp 100.000,- (Seratus Ribu Rupiah)</span>. 
+                                            <br><span class="text-[0.85em] font-medium text-gray-700 italic">Dipotong secara rutin setiap bulan melalui sistem payroll perusahaan.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <p class="mb-4">
+                                    Demikian surat pernyataan ini saya buat dengan sebenarnya tanpa ada unsur paksaan dari pihak manapun, agar dapat dipergunakan sebagaimana mestinya.
+                                </p>
+                            </div>
+
+                            <!-- AREA TANDA TANGAN -->
+                            <div class="flex justify-end mt-auto pb-4">
+                                <div class="text-center w-64">
+                                    <p class="mb-1" id="previewTanggal">Bogor, 15 Januari 2026</p>
+                                    <div class="h-[100px]"></div> 
+                                    <p class="font-bold underline uppercase" id="previewNamaTTD">( Nama Lengkap )</p>
+                                    <p class="text-[0.8em] italic">Anggota Koperasi</p>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-
-                    <!-- SPACE SEBELUM JUDUL (5 baris) -->
-                    <div class="h-[75px]"></div>
-
-                    <div class="text-center">
-                        <h2 class="text-[1.15em] font-bold underline decoration-1 underline-offset-2 uppercase">SURAT PERNYATAAN KESANGGUPAN POTONG GAJI</h2>
-                    </div>
-
-                    <!-- SPACE SETELAH JUDUL (4 baris) -->
-                    <div class="h-[60px]"></div>
-
-                    <div class="text-justify">
-                        <p class="mb-2">Saya yang bertanda tangan di bawah ini:</p>
-                        
-                        <table class="w-full mb-3 ml-4 border-separate border-spacing-y-0.5">
-                            <tr><td class="w-40">Nama Lengkap</td><td class="w-4">:</td><td class="font-bold" id="previewNama">[Nama Lengkap]</td></tr>
-                            <tr><td>Jabatan</td><td>:</td><td id="previewJabatan">[Jabatan]</td></tr>
-                            <tr><td>Departemen/Unit</td><td>:</td><td id="previewDepartemen">[Departemen]</td></tr>
-                        </table>
-
-                        <p class="mb-3">
-                            Dengan ini menyatakan secara sadar dan sukarela terdaftar sebagai anggota <span id="textKopNama" class="font-bold">KOPERASI KONSUMEN KARYAWAN MITRA KIARA INDONESIA</span> dan memberikan kuasa serta wewenang kepada Bagian Payroll / HRD untuk melakukan pemotongan gaji saya guna pembayaran kewajiban anggota sebagai berikut:
-                        </p>
-
-                        <div class="ml-4 mb-3 border border-black p-3 bg-gray-50">
-                            <ul class="list-disc list-outside ml-5 space-y-1">
-                                <li>
-                                    <span class="font-bold">Simpanan Pokok</span> sebesar <span class="font-bold italic">Rp 200.000,- (Dua Ratus Ribu Rupiah)</span>. 
-                                    <br><span class="text-[0.85em] font-medium text-gray-700 italic">Dipotong satu kali pada saat awal menjadi anggota koperasi.</span>
-                                </li>
-                                <li>
-                                    <span class="font-bold">Simpanan Wajib</span> sebesar <span class="font-bold italic">Rp 100.000,- (Seratus Ribu Rupiah)</span>. 
-                                    <br><span class="text-[0.85em] font-medium text-gray-700 italic">Dipotong secara rutin setiap bulan melalui sistem payroll perusahaan.</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <p class="mb-4">
-                            Demikian surat pernyataan ini saya buat dengan sebenarnya tanpa ada unsur paksaan dari pihak manapun, agar dapat dipergunakan sebagaimana mestinya.
-                        </p>
-                    </div>
-
-                    <!-- AREA TANDA TANGAN (Ditambah spasi +2 baris) -->
-                    <div class="flex justify-end mt-auto pb-4">
-                        <div class="text-center w-64">
-                            <p class="mb-1" id="previewTanggal">Bogor, 15 Januari 2026</p>
-                            <!-- Tinggi area tanda tangan ditambah (h-24 atau mb-20) -->
-                            <div class="h-[100px]"></div> 
-                            <p class="font-bold underline uppercase" id="previewNamaTTD">( Nama Lengkap )</p>
-                            <p class="text-[0.8em] italic">Anggota Koperasi</p>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -259,7 +278,7 @@
                 
                 memberData = lines.slice(1).map(line => {
                     const columns = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-                    const clean = (val) => val ? val.trim().replace(/^"|"$/g, '') : '';
+                    const clean = (val) => val ? val.trim().replace(/^"|"$|^'|'$/g, '') : '';
                     return {
                         nama: clean(columns[1]),
                         unit: clean(columns[2]),
