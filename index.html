@@ -277,7 +277,8 @@
                 const lines = csvText.split('\n');
                 
                 memberData = lines.slice(1).map(line => {
-                    const columns = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+                    // Memisahkan berdasarkan koma, tapi mengabaikan koma di dalam tanda kutip
+                    const columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     const clean = (val) => val ? val.trim().replace(/^"|"$|^'|'$/g, '') : '';
                     return {
                         nama: clean(columns[1]),
